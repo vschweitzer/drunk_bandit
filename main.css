@@ -13,6 +13,7 @@ html, body {
 header {
     color: #d7930b;
     background-color: #1b1302;
+    padding: 0.25rem 1rem;
 }
 
 main {
@@ -28,7 +29,11 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
     font-weight: normal;
+    font-size: 1rem;
+}
 
+h1 strong {
+    font-size: 2.5rem;
 }
 
 .slot {
@@ -37,7 +42,11 @@ h1 {
     align-items: center;
     text-align: center;
     font-size: 3rem;
-    background-color: #e4ddd0;
+    
+    background: rgb(150,147,139);
+    background: linear-gradient(0deg, rgba(150,147,139,1) 0%, rgba(255,255,255,1) 25%, rgba(228,221,208,1) 75%, rgba(150,147,139,1) 100%);
+
+    margin: 0 0.15rem;
 }
 
 .field {
