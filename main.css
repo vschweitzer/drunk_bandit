@@ -1,0 +1,72 @@
+html {
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+    font-family: "Urbanist";
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    color: #d7930b;
+    background-color: #1b1302;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    background-color: #530a15;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Urbanist Semibold";
+
+}
+
+h1 {
+    font-weight: normal;
+
+}
+
+.slot {
+    min-width: 5rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 3rem;
+    background-color: #e4ddd0;
+}
+
+.field {
+    min-height: 5rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-collapse: collapse;
+    border: 0.2rem solid black;
+    margin: -0.2rem 0 -0.2rem 0;
+}
+
+.flex {
+    display: flex;
+}
+
+.fcenter {
+    align-items: center;
+    justify-content: center;
+}
+
+.fgrow {
+    flex-grow: 1;
+}
+
+.fv {
+    flex-direction: column;
+}
+
+* {
+    box-sizing: border-box;
+}
