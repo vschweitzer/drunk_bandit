@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="flex fv">
+     <meta charset="utf-8">
     <head>
         <link href="main.css" rel="stylesheet" />
         <title>
@@ -14,10 +15,39 @@
             </h1>
             
         </header>
-        <main class="flex fcenter fgrow fv">
-            <div id="slots" class="flex fcenter">
-            </div>
-        </main>
+        <div class="flex fcenter fgrow wrapper">
+            <aside class="flex fcenter fv">
+                <h2>
+                    How To Play
+                </h2>
+                <p>
+                    Press any key to stop wheel after wheel.<br>
+                    Press any key to start again.<br>
+                </p>
+                <h2>
+                    Score Selection
+                </h2>
+                <p>
+                    Longest streak counts.<br>
+                    Ingredients are in center row<br>
+                </p>
+            </aside>
+            <main class="flex fcenter fgrow fh">
+        
+                <div id="wheel_frame" class="flex fcenter">
+                    <div id="wheel_overlay" class="flex fcenter">
+                        <div id="slots" class="flex fcenter">
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                </main>
+                <aside class="flex fcenter fv">
+
+                </aside>
+        </div>
+        
     </body>
     <script src="slots.js"></script>
 </html>
