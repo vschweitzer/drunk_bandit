@@ -146,22 +146,70 @@ async function _main() {
         }
     }
 
-    
-      
+    function read_wheel(width = 4, height = 5) {
+        const rmat = new Array(height);
+        for(let i = 0; i < height; i++) {
+            rmat[i] = new Array(width);
+            for(let j = 0; j < height; j++) {
+                rmat[i][j] = document.getElementById(get_field_id(j, i));
+            }
+        }
+
+        return rmat;
+    }
+  
+    // https://stackoverflow.com/questions/58573919/longest-repeating-character-in-string-javascript
+    function longestRepetition (str) {
+        let longestChunk = '';
+        let currentChunk = '';
+        for(let i = 0; i < str.length; i++){
+           if(currentChunk[0] !== str[i]){
+              currentChunk = str[i];
+           } else {
+              currentChunk += str[i];
+           }
+           if(currentChunk.length > longestChunk.length){
+              longestChunk = currentChunk;
+           }
+        }
+        return [longestChunk[0] ?? '', longestChunk.length];
+    }
+
+    function score(rmat, min_length = 3) {
+
+    }
+
+    function score_horizontal(rmat, min_length = 3) {
+        const reps = rmat.map((row) => {
+            return longestRepetition(row);
+        }).reduce((best, current, index) => {
+            if(current.length < min_length) {
+                return best;
+            }
+            if(best === undefined) {
+                return current;
+            }
+            if(current.length === best.length) {
+                // check here which is closer to the center
+            }
+
+            //...
+        }, undefined);
+    }
     
     const mat = create_slots(wheels);
     let index = 0;
     const iw_delay = 200;
     
-    let first_run = true;
+    let first_run = wheels;
     await sleeb(1000);
     const round_delay = 20;
     while(true) {
         for(let i = run_anim; i < wheels; i++) {
             shift_wheel(mat, i, 5, index);
             if(first_run) {
-                first_run = false;
-                await sleeb(round_delay * Math.random() * Math.random() * 6);
+                --first_run;
+                await sleeb(round_delay * Math.random()* 5 * Math.random());
             }
 
             await sleeb(round_delay);
