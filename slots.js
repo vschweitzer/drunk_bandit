@@ -98,40 +98,18 @@ const SYMBOLS = new Map([
 const KEYS = Array.from(SYMBOLS.keys());
 
 function get_value(key, a = KEYS) {
-    return a.findIndex((e) => {
+    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    
+    const index = a.findIndex((e) => {
         return e === key;
     });
+
+    return alphabet[index];
 }
 
-class Cocktail {
-    insert(ingredient) {
-        const key = get_value(ingredient);
-        if (this.ingredients.has(key)) {
-            this.ingredients
-                .get(key)
-                .set("quantity", this.ingredients.get("quantity") + 1);
-        } else {
-            this.ingredients.set(key, new Map());
-            this.ingredients.get(key).set("quantity", 1);
-        }
-    }
-
-    constructor(recipe) {
-        this.ingredients = new Map();
-        for (const index in recipe) {
-            const ingredient = recipe[index];
-            this.insert(ingredient);
-        }
-    }
-
-    to_string() {
-        let string = "";
-        const i = this.ingredients;
-
-        for (const key in i) {
-            string += "";
-        }
-    }
+function index_from_value(value) {
+    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return alphabet.search(value);
 }
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
@@ -326,7 +304,8 @@ function final_score(scores, min_length = 3) {
     if (best_score[0].length < min_length) {
         str_repr = "No Win";
     } else {
-        for (const index of best_score[0]) {
+        for (const value of best_score[0]) {
+            const index = index_from_value(value);
             const key = KEYS[index];
             const str = get_display_version(SYMBOLS, key);
             str_repr += str;
