@@ -69,6 +69,14 @@ h1 strong {
     font-size: 2.5rem;
 }
 
+#cocktail ul {
+    margin: 0.25rem;
+    padding: 0.25rem;
+    border-style: solid none;
+    border-color:#fff;
+    border-width: 0.1rem;
+}
+
 #scoreboard {
     font-size: 2em;
 }

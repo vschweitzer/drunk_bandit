@@ -29,9 +29,8 @@ const SYMBOLS = new Map([
         "🍍",
         {
             name: "Pineapple Juice",
-
-            quanitity: 30,
-        },
+            quantity: 30,
+        }
     ],
     [
         "♣️",
@@ -97,6 +96,42 @@ const SYMBOLS = new Map([
 
 const KEYS = Array.from(SYMBOLS.keys());
 
+class Cocktail {
+    constructor(recipe) { // Takes a string of key indices
+        this.ingredients = new Map();
+        for(const index in recipe) {
+            const i_index = index_from_value(recipe[index]);
+            const key = KEYS[i_index];
+            const ingredient = SYMBOLS.get(key);
+            console.log(i_index);
+            console.log(key);
+            console.log(ingredient);
+
+            if(this.ingredients.has(key)) {
+                this.ingredients.get(key).set("quantity", this.ingredients.get(key).get("quantity") + ingredient["quantity"]);
+            } else {
+                this.ingredients.set(key, new Map([
+                    ["name", ingredient["name"]],
+                    ["quantity", ingredient["quantity"]],
+                ]));
+            }
+        }
+    };
+
+    to_html() {
+        console.log(this.ingredients);
+
+        let list = "<ul>\n";
+
+        this.ingredients.forEach((value, key, map) => {
+            list += "<li>" + value.get("quantity") + "ml " + value.get("name") + "</li>\n";
+        })
+
+        list += "</ul>\n";
+        return list;
+    }
+}
+
 function get_value(key, a = KEYS) {
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
@@ -146,7 +181,9 @@ function rot45(array, reverse = false) {
 }
 
 function compare_scores(a, b) {
-    if (a === b) {
+    const dir_rank = ["horizontal", "vertical"];
+
+    if (a === undefined && b === undefined) {
         return 0;
     }
     if (a === undefined) {
@@ -163,10 +200,26 @@ function compare_scores(a, b) {
         return -1;
     }
 
-    if (a[1] < b[1]) {
+    const a_props = a[1];
+    const b_props = b[1];
+
+    const a_rank = dir_rank.findIndex((a) => {a === a_props["direction"]});
+    const b_rank = dir_rank.findIndex((b) => {b === b_props["direction"]});
+
+    const a_offset = a_props["offset"];
+    const b_offset = b_props["offset"];
+
+    if(a_rank < b_rank) {
         return 1;
     }
-    if (a[1] > b[1]) {
+    if(b_rank < a_rank) {
+        return -1;
+    }
+    
+    if(a_offset < b_offset) {
+        return 1;
+    }
+    if(b_offset < a_offset) {
         return -1;
     }
 
@@ -274,7 +327,7 @@ function longestRepetition(str) {
         if (i > 0) {
             if (str[i] === str[i - 1]) {
                 chunk += str[i];
-                console.log("chunk**", chunk);
+                //console.log("chunk**", chunk);
             }
             if (str[i] !== str[i - 1]) {
                 chunk = str[i];
@@ -284,7 +337,7 @@ function longestRepetition(str) {
             }
         }
     }
-    console.log(longest);
+    //console.log(longest);
     return longest;
 }
 
@@ -298,12 +351,14 @@ function get_scores(rmat) {
 
 function final_score(scores, min_length = 3) {
     const best_score = scores.sort(compare_scores).reverse()[0];
-
+    
     let str_repr = "";
 
     if (best_score[0].length < min_length) {
         str_repr = "No Win";
     } else {
+        console.log(scores);
+        console.log(best_score);
         for (const value of best_score[0]) {
             const index = index_from_value(value);
             const key = KEYS[index];
@@ -313,7 +368,7 @@ function final_score(scores, min_length = 3) {
     }
 
     display_score(str_repr);
-    return str_repr;
+    return best_score;
 }
 
 function display_score(text) {
@@ -321,10 +376,26 @@ function display_score(text) {
     scoreboard.innerText = text;
 }
 
+function display_cocktails(cocktails) {
+    const scoreboard = document.getElementById("cocktail");
+    scoreboard.innerHTML = "";
+
+    const nodes = cocktails.map((c) => (c.to_html()));
+    console.log(nodes)
+    const string = nodes.join("\n");
+    scoreboard.innerHTML = string;
+    console.log("Cocktails: " + string);
+
+}
+
 function score_horizontal(rmat) {
     const reps = rmat.map((a, i) => {
         const offset = Math.abs(Math.round(wheels / 2) - i);
-        return [longestRepetition(a.join("")), offset];
+        return [longestRepetition(a.join("")), new Map([
+            ["direction", "horizontal"],
+            ["position", i],
+            ["offset", offset]
+        ])];
     });
 
     return reps;
@@ -336,27 +407,37 @@ function score_vertical(rmat) {
 
     const res_r = rr.map((a, i) => {
         const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
-        return [longestRepetition(a.join("")), offset];
+        return [longestRepetition(a.join("")), new Map([
+            ["direction", "vertical"],
+            ["position", i],
+            ["offset", offset],
+        ])];
     });
 
     const res_l = rl.map((a, i) => {
-        const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
-        return [longestRepetition(a.join("")), offset];
+        const offset = Math.abs(Math.round(rl.length / 2) - i) + rmat.length;
+        return [longestRepetition(a.join("")), new Map([
+            ["direction", "vertical"],
+            ["position", i],
+            ["offset", offset],
+        ])];
     });
 
     const all = res_r.concat(res_l);
-    console.log("Vertical");
-    console.log(all);
 
     return all;
 }
 
-function get_cocktails(offset) {
+function get_cocktails(offset, recipe_length, min_length = 3) {
     const rmat = read_wheel();
     let start;
     let length;
     const cocktails = new Array();
     const height = rmat.length;
+
+    if(recipe_length < min_length) {
+        return cocktails;
+    }
 
     if (!offset) {
         start = 0;
@@ -368,8 +449,12 @@ function get_cocktails(offset) {
     }
 
     for (let i = start; i < start + length; i++) {
-        cocktails.push(); // TODO
+        const recipe = rmat[i].join("").slice(0, recipe_length)
+        console.log("recipe " + recipe);
+        cocktails.push(new Cocktail(recipe)); // TODO
     }
+
+    return cocktails;
 }
 
 // https://stackoverflow.com/questions/29085197/how-do-you-json-stringify-an-es6-map
@@ -413,7 +498,10 @@ async function _main() {
         run_anim = (run_anim + 1) % (wheels + 1);
         if (run_anim === wheels) {
             const scores = get_scores(read_wheel());
-            final_score(scores);
+            const best_score = final_score(scores);
+            const cocktails = get_cocktails(best_score[1]["offset"], best_score[0].length);
+            console.log(cocktails);
+            display_cocktails(cocktails);
         }
     });
     await _main();
