@@ -21,6 +21,8 @@ A slot machine that lets you gamble for cocktail recipes (and for free!).
 
 ## Customizing the Game
 
+I am not a JS developer, so the code will not be very good.
+
 To add or remove ingredients, edit the global `SYMBOLS` map.
 Each entry needs a key, a name and an amount (in milliliters).
 Optionally, you can add an optional property called "display", which should be an array of utf-16 character codes.
