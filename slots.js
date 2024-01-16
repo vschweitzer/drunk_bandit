@@ -486,13 +486,13 @@ function get_cocktails(recipe_length, direction, position, min_length = 3) {
         } else {
             if(position + 1 < middle) {
                 for(let i = 0; i < middle; ++i) {
-                    if(i + 1 !== position) {
+                    if(i !== position) {
                         lines.push(i);
                     }
                 }
             } else if(position + 1 > middle) {
                 for(let i = middle - 1; i < height; ++i) {
-                    if(i + 1 !== position) {
+                    if(i !== position) {
                         lines.push(i);
                     }
                 }
