@@ -222,7 +222,7 @@ function rot45(array, reverse = false) {
 }
 
 function compare_scores(a, b) {
-    const dir_rank = ["horizontal", "vertical"];
+    const dir_rank = ["horizontal", "diagonal"];
 
     if (a[0].length > b[0].length) {
         return 1;
@@ -376,7 +376,7 @@ function longestRepetition(str) {
 
 function get_scores(rmat) {
     let scores = score_horizontal(rmat);
-    scores = scores.concat(score_vertical(rmat));
+    scores = scores.concat(score_diagonal(rmat));
     scores.sort(compare_scores);
 
     return scores;
@@ -435,14 +435,14 @@ function score_horizontal(rmat) {
     return reps;
 }
 
-function score_vertical(rmat) {
+function score_diagonal(rmat) {
     const rr = rot45(rmat);
     const rl = rot45(rmat, true);
 
     const res_r = rr.map((a, i) => {
         const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
         return [longestRepetition(a.join("")), new Map([
-            ["direction", "vertical"],
+            ["direction", "diagonal"],
             ["position", i],
             ["offset", offset],
         ])];
@@ -451,7 +451,7 @@ function score_vertical(rmat) {
     const res_l = rl.map((a, i) => {
         const offset = Math.abs(Math.round(rl.length / 2) - i) + rmat.length;
         return [longestRepetition(a.join("")), new Map([
-            ["direction", "vertical"],
+            ["direction", "diagonal"],
             ["position", i],
             ["offset", offset],
         ])];
@@ -473,7 +473,7 @@ function get_cocktails(recipe_length, direction, position, min_length = 3) {
         return cocktails;
     }
 
-    if(direction === "vertical") {
+    if(direction === "diagonal") {
         lines.push(middle - 1);
     } else if(direction === "horizontal") {
         if(position + 1 === middle) {
