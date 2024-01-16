@@ -92,6 +92,48 @@ const SYMBOLS = new Map([
             quantity: 15,
         },
     ],
+    [
+        "🍏",
+        {
+            name: "Apple Juice",
+            quantity: 30,
+        }
+    ],
+    [
+        "💚",
+        {
+            name: "Lime Juice",
+            quantity: 15,
+        }
+    ],
+    [
+        "🎱",
+        {
+            name: "Gin",
+            quantity: 15,
+        },
+    ],/*
+    [
+        "🍾",
+        {
+            name: "Sparkling Wine",
+            quantity: 30,
+        }
+    ],
+    [
+        "🍺",
+        {
+            name: "Beer",
+            quantity: 30,
+        }
+    ],
+    [
+        "🍶",
+        {
+            name: "Sake",
+            quantity: 30,
+        }
+    ]*/
 ]);
 
 const KEYS = Array.from(SYMBOLS.keys());
@@ -183,16 +225,6 @@ function rot45(array, reverse = false) {
 function compare_scores(a, b) {
     const dir_rank = ["horizontal", "vertical"];
 
-    if (a === undefined && b === undefined) {
-        return 0;
-    }
-    if (a === undefined) {
-        return -1;
-    }
-    if (b === undefined) {
-        return 1;
-    }
-
     if (a[0].length > b[0].length) {
         return 1;
     }
@@ -203,11 +235,13 @@ function compare_scores(a, b) {
     const a_props = a[1];
     const b_props = b[1];
 
-    const a_rank = dir_rank.findIndex((a) => {a === a_props["direction"]});
-    const b_rank = dir_rank.findIndex((b) => {b === b_props["direction"]});
+    const a_rank = dir_rank.indexOf(a_props.get("direction"));
+    const b_rank = dir_rank.indexOf(b_props.get("direction"));
 
-    const a_offset = a_props["offset"];
-    const b_offset = b_props["offset"];
+    console.log("ranks" + a_rank + " " + b_rank);
+
+    const a_offset = a_props.get("offset");
+    const b_offset = b_props.get("offset");
 
     if(a_rank < b_rank) {
         return 1;
@@ -344,14 +378,15 @@ function longestRepetition(str) {
 function get_scores(rmat) {
     let scores = score_horizontal(rmat);
     scores = scores.concat(score_vertical(rmat));
-    scores.sort(compare_scores).reverse();
+    scores.sort(compare_scores);
 
     return scores;
 }
 
 function final_score(scores, min_length = 3) {
     const best_score = scores.sort(compare_scores).reverse()[0];
-    
+    console.log(scores);
+
     let str_repr = "";
 
     if (best_score[0].length < min_length) {
@@ -382,7 +417,7 @@ function display_cocktails(cocktails) {
 
     const nodes = cocktails.map((c) => (c.to_html()));
     console.log(nodes)
-    const string = nodes.join("\n");
+    const string = nodes.join("\n<p>☞ or ☜</p>\n");
     scoreboard.innerHTML = string;
     console.log("Cocktails: " + string);
 
@@ -428,28 +463,48 @@ function score_vertical(rmat) {
     return all;
 }
 
-function get_cocktails(offset, recipe_length, min_length = 3) {
+function get_cocktails(recipe_length, direction, position, min_length = 3) {
     const rmat = read_wheel();
-    let start;
-    let length;
+    let lines = new Array();
     const cocktails = new Array();
     const height = rmat.length;
+    const middle = Math.round(height / 2.0 + 0.1);
 
     if(recipe_length < min_length) {
         return cocktails;
     }
 
-    if (!offset) {
-        start = 0;
-        length = height;
-    } else {
-        const center = Math.round(height / 2.0);
-        length = 1;
-        start = center;
+    if(direction === "vertical") {
+        lines.push(middle - 1);
+    } else if(direction === "horizontal") {
+        if(position + 1 === middle) {
+            for(let i = 0; i < height; ++i) {
+                if(i + 1 !== middle) {
+                    lines.push(i);
+                }
+            }
+        } else {
+            if(position + 1 < middle) {
+                for(let i = 0; i < middle; ++i) {
+                    if(i + 1 !== position) {
+                        lines.push(i);
+                    }
+                }
+            } else if(position + 1 > middle) {
+                for(let i = middle - 1; i < height; ++i) {
+                    if(i + 1 !== position) {
+                        lines.push(i);
+                    }
+                }
+            }
+        }
     }
 
-    for (let i = start; i < start + length; i++) {
-        const recipe = rmat[i].join("").slice(0, recipe_length)
+    console.log("lines: ");
+    console.log(lines);
+
+    for (const line_index of lines) {
+        const recipe = rmat[line_index].join("").slice(0, recipe_length)
         console.log("recipe " + recipe);
         cocktails.push(new Cocktail(recipe)); // TODO
     }
@@ -499,7 +554,7 @@ async function _main() {
         if (run_anim === wheels) {
             const scores = get_scores(read_wheel());
             const best_score = final_score(scores);
-            const cocktails = get_cocktails(best_score[1]["offset"], best_score[0].length);
+            const cocktails = get_cocktails(best_score[0].length, best_score[1].get("direction"), best_score[1].get("position"));
             console.log(cocktails);
             display_cocktails(cocktails);
         }
