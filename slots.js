@@ -1,4 +1,4 @@
-const wheels = 4;
+const wheels = 5;
 let run_anim = 0;
 
 async function sleeb(mil) {
@@ -14,7 +14,6 @@ const SYMBOLS = new Map([
         "🍋",
         {
             name: "Lemon Juice",
-
             quantity: 15, // ml
         },
     ],
@@ -280,7 +279,7 @@ function get_display_version(dict, key) {
     }
 }
 
-function get_symbols(width = 4) {
+function get_symbols(width = wheels) {
     const sym = Array.from(SYMBOLS.keys());
     const mat = new Array(width);
     for (let i = 0; i < width; i++) {
@@ -290,7 +289,7 @@ function get_symbols(width = 4) {
     return mat;
 }
 
-function create_slots(width = 4, height = 5) {
+function create_slots(width = wheels, height = 5) {
     const slot_div = get_slot_div();
     const mat = get_symbols(width);
 
@@ -331,7 +330,7 @@ function shift_wheel(mat, wheel_index, height = 5, index = 0) {
     }
 }
 
-function read_wheel(width = 4, height = 5) {
+function read_wheel(width = wheels, height = 5) {
     const rmat = new Array(height);
     for (let i = 0; i < height; i++) {
         rmat[i] = new Array(width);
@@ -536,12 +535,12 @@ async function _main() {
             shift_wheel(mat, i, 5, index);
             if (first_run) {
                 --first_run;
-                await sleeb(round_delay * Math.random() * 5 * Math.random());
+                await sleeb(round_delay + round_delay * Math.random() * 5 * Math.random());
             }
 
             await sleeb(round_delay);
         }
-        await sleeb(100);
+        await sleeb((round_delay * 8) - round_delay * (wheels - run_anim));
         index += 1;
     }
 }
