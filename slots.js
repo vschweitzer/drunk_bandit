@@ -1,11 +1,12 @@
 const wheels = 5;
 const wheel_height = 5;
 let run_anim = 0;
+const animation_speed = 3.0;
 
 // This needs a speed variable additional to the fps, 
 // but i'm too tired right now.
 
-const fps = 64;
+const fps = 256;
 const round_delay = 20;
 
 let animation_frames = new Array(wheels).fill(1);
@@ -469,7 +470,7 @@ function animate_wheel(
     const index = indices[wheel_index];
 
     if (run) {
-        const field_offset = 60 - (field_height / fps) * mod(animation_frame, fps);
+        const field_offset =(field_height / fps * animation_frames[wheel_index]) - (field_height / 2);
 
         if (!mod(animation_frame, fps)) {
             const sym_len = mat[wheel_index].length;
@@ -489,8 +490,8 @@ function animate_wheel(
             indices[wheel_index] += 1;
         }
 
-        set_offset_rule(wheel_index, -field_offset);
-        animation_frames[wheel_index] += 1;
+        set_offset_rule(wheel_index,  field_offset);
+        animation_frames[wheel_index] = mod(animation_frames[wheel_index] + animation_speed, fps);
     }
 }
 
@@ -731,7 +732,7 @@ async function _main() {
         setInterval(
             animate_wheel,
             1000 / fps,
-            ...[mat, i, wheel_height, 1, fps, 60]
+            ...[mat, i, wheel_height, 1, fps]
         );
     }
 }
