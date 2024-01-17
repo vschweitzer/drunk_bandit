@@ -1,5 +1,9 @@
 const wheels = 5;
+const wheel_height = 5;
 let run_anim = 0;
+
+const fps = 60;
+const round_delay = 20;
 
 async function sleeb(mil) {
     return new Promise((resolve) => {
@@ -369,7 +373,7 @@ function get_symbols(width = wheels) {
     return mat;
 }
 
-function create_slots(width = wheels, height = 5) {
+function create_slots(width = wheels, height = wheel_height) {
     const slot_div = get_slot_div();
     const mat = get_symbols(width);
 
@@ -394,7 +398,7 @@ function create_slots(width = wheels, height = 5) {
     return mat;
 }
 
-function shift_wheel(mat, wheel_index, height = 5, index = 0) {
+function shift_wheel(mat, wheel_index, height = wheel_height, index = 0) {
     const sym_len = mat[wheel_index].length;
 
     for (let i = 0; i < height; i++) {
@@ -410,7 +414,7 @@ function shift_wheel(mat, wheel_index, height = 5, index = 0) {
     }
 }
 
-function read_wheel(width = wheels, height = 5) {
+function read_wheel(width = wheels, height = wheel_height) {
     const rmat = new Array(height);
     for (let i = 0; i < height; i++) {
         rmat[i] = new Array(width);
@@ -609,7 +613,7 @@ async function _main() {
 
     let first_run = wheels;
     await sleeb(1000);
-    const round_delay = 20;
+    
     while (true) {
         for (let i = run_anim; i < wheels; i++) {
             shift_wheel(mat, i, 5, indices[i]);
