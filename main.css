@@ -15,14 +15,19 @@ header {
     color: #d7930b;
     background-color: #1b1302;
     padding: 0.25rem 1rem;
+
+    overflow: auto;
+    max-height: 20vh;
 }
 
 .wrapper{
     padding: 2rem;
+    max-height: 80vh;
 }
 
 main {
     height: 100%;
+    overflow: auto;
 }
 
 aside {
@@ -40,6 +45,8 @@ aside {
     text-align: center;
     color: #fff;
     font-family: "Crimson Pro", serif;
+
+    overflow: auto;
 }
 
 aside h2 {
@@ -71,7 +78,6 @@ h1 strong {
 }
 
 #cocktail {
-    overflow: auto;
     max-height: 100%;
     max-width: 100%;
 }
