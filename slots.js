@@ -71,13 +71,6 @@ const SYMBOLS = new Map([
         },
     ],
     [
-        "💩",
-        {
-            name: "Baileys",
-            quantity: 15,
-        },
-    ],
-    [
         "🥥",
         {
             name: "Coconut Syrup",
@@ -111,7 +104,94 @@ const SYMBOLS = new Map([
             name: "Gin",
             quantity: 15,
         },
-    ],/*
+    ],
+    [
+        "🍓",
+        {
+            name: "Strawberry Juice",
+            quantity: 30,
+        }
+    ],
+    [
+        "🍇",
+        {
+            name: "Cranberry Juice",
+            quantity: 30,
+        }
+    ],
+    [
+        "🍑",
+        {
+            name: "Peach liqueur",
+            quantity: 15,
+        }
+    ],
+    [
+        "🥭",
+        {
+            name: "Mango Juice",
+            quantity: 30,
+        }
+    ],
+    [
+        "🍫",
+        {
+            name: "Creme de Cacao",
+            quantity: 15,
+        }
+    ],
+    [
+        "🦌",
+        {
+            name: "Jägermeister",
+            quantity: 15,
+        }
+    ],
+    [
+        "🔥",
+        {
+            name: "Fireball Whiskey",
+            quantity: 15,
+        }
+    ],
+    [
+        "🌵",
+        {
+            name: "Mezcal",
+            quantity: 15,
+        }
+    ],
+    [
+        "☕",
+        {
+            name: "Espresso",
+            quantity: 30,
+        }
+    ],
+    [
+        "🧉",
+        {
+            name: "Club Mate",
+            quantity: 30,
+        }
+    ],
+    
+    /* 
+    // These entries are most likely terrible additions.
+    [
+        "🍅",
+        {
+            name: "Tomato Juice",
+            quantity: 30,
+        }
+    ],
+    [
+        "💩",
+        {
+            name: "Baileys",
+            quantity: 15,
+        },
+    ],
     [
         "🍾",
         {
@@ -525,23 +605,22 @@ function replacer(key, value) {
 
 async function _main() {
     const mat = create_slots(wheels);
-    let index = 0;
+    let indices = new Array(wheels).fill(0);
 
     let first_run = wheels;
     await sleeb(1000);
     const round_delay = 20;
     while (true) {
         for (let i = run_anim; i < wheels; i++) {
-            shift_wheel(mat, i, 5, index);
+            shift_wheel(mat, i, 5, indices[i]);
+            indices[i] += 1;
             if (first_run) {
                 --first_run;
                 await sleeb(round_delay + round_delay * Math.random() * 5 * Math.random());
             }
-
             await sleeb(round_delay);
         }
         await sleeb((round_delay * 8) - round_delay * (wheels - run_anim));
-        index += 1;
     }
 }
 
