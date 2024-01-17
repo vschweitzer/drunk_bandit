@@ -13,6 +13,11 @@ async function sleeb(mil) {
     });
 }
 
+// https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
+function mod(n, m) {
+    return ((n % m) + m) % m;
+  }
+
 const SYMBOLS = new Map([
     [
         "🍋",
@@ -373,7 +378,7 @@ function get_symbols(width = wheels) {
     return mat;
 }
 
-function create_slots(width = wheels, height = wheel_height) {
+function create_slots(width = wheels, height = wheel_height, negative_fields = 1) {
     const slot_div = get_slot_div();
     const mat = get_symbols(width);
 
@@ -382,12 +387,13 @@ function create_slots(width = wheels, height = wheel_height) {
         slot.classList.add("slot");
         slot.id = get_slot_id(i);
         slot_div.appendChild(slot);
-        for (let j = 0; j < height; j++) {
+        for (let j = -negative_fields; j < height; j++) {
             const field = document.createElement("div");
             field.classList.add("field");
             field.id = get_field_id(i, j);
-            const text = get_display_version(SYMBOLS, mat[i][j]);
-            const val = get_value(mat[i][j]);
+            const index = mod(j, mat[i].length);
+            const text = get_display_version(SYMBOLS, mat[i][index]);
+            const val = get_value(mat[i][index]);
 
             field.innerText = text;
             field.setAttribute("value", val);
