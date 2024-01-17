@@ -2,8 +2,14 @@ const wheels = 5;
 const wheel_height = 5;
 let run_anim = 0;
 
-const fps = 60;
+// This needs a speed variable additional to the fps, 
+// but i'm too tired right now.
+
+const fps = 64;
 const round_delay = 20;
+
+let animation_frames = new Array(wheels).fill(1);
+let indices = new Array(wheels).fill(0);
 
 async function sleeb(mil) {
     return new Promise((resolve) => {
@@ -16,7 +22,7 @@ async function sleeb(mil) {
 // https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
 function mod(n, m) {
     return ((n % m) + m) % m;
-  }
+}
 
 const SYMBOLS = new Map([
     [
@@ -38,7 +44,7 @@ const SYMBOLS = new Map([
         {
             name: "Pineapple Juice",
             quantity: 30,
-        }
+        },
     ],
     [
         "♣️",
@@ -98,14 +104,14 @@ const SYMBOLS = new Map([
         {
             name: "Apple Juice",
             quantity: 30,
-        }
+        },
     ],
     [
         "💚",
         {
             name: "Lime Juice",
             quantity: 15,
-        }
+        },
     ],
     [
         "🎱",
@@ -119,72 +125,72 @@ const SYMBOLS = new Map([
         {
             name: "Strawberry Juice",
             quantity: 30,
-        }
+        },
     ],
     [
         "🍇",
         {
             name: "Cranberry Juice",
             quantity: 30,
-        }
+        },
     ],
     [
         "🍑",
         {
             name: "Peach liqueur",
             quantity: 15,
-        }
+        },
     ],
     [
         "🥭",
         {
             name: "Mango Juice",
             quantity: 30,
-        }
+        },
     ],
     [
         "🍫",
         {
             name: "Creme de Cacao",
             quantity: 15,
-        }
+        },
     ],
     [
         "🦌",
         {
             name: "Jägermeister",
             quantity: 15,
-        }
+        },
     ],
     [
         "🔥",
         {
             name: "Fireball Whiskey",
             quantity: 15,
-        }
+        },
     ],
     [
         "🌵",
         {
             name: "Mezcal",
             quantity: 15,
-        }
+        },
     ],
     [
         "☕",
         {
             name: "Espresso",
             quantity: 30,
-        }
+        },
     ],
     [
         "🧉",
         {
             name: "Club Mate",
             quantity: 30,
-        }
+        },
     ],
-    
+
     /* 
     // These entries are most likely terrible additions.
     [
@@ -227,9 +233,10 @@ const SYMBOLS = new Map([
 const KEYS = Array.from(SYMBOLS.keys());
 
 class Cocktail {
-    constructor(recipe) { // Takes a string of key indices
+    constructor(recipe) {
+        // Takes a string of key indices
         this.ingredients = new Map();
-        for(const index in recipe) {
+        for (const index in recipe) {
             const i_index = index_from_value(recipe[index]);
             const key = KEYS[i_index];
             const ingredient = SYMBOLS.get(key);
@@ -237,16 +244,25 @@ class Cocktail {
             console.log(key);
             console.log(ingredient);
 
-            if(this.ingredients.has(key)) {
-                this.ingredients.get(key).set("quantity", this.ingredients.get(key).get("quantity") + ingredient["quantity"]);
+            if (this.ingredients.has(key)) {
+                this.ingredients
+                    .get(key)
+                    .set(
+                        "quantity",
+                        this.ingredients.get(key).get("quantity") +
+                            ingredient["quantity"]
+                    );
             } else {
-                this.ingredients.set(key, new Map([
-                    ["name", ingredient["name"]],
-                    ["quantity", ingredient["quantity"]],
-                ]));
+                this.ingredients.set(
+                    key,
+                    new Map([
+                        ["name", ingredient["name"]],
+                        ["quantity", ingredient["quantity"]],
+                    ])
+                );
             }
         }
-    };
+    }
 
     to_html() {
         console.log(this.ingredients);
@@ -254,8 +270,13 @@ class Cocktail {
         let list = "<ul>\n";
 
         this.ingredients.forEach((value, key, map) => {
-            list += "<li>" + value.get("quantity") + "ml " + value.get("name") + "</li>\n";
-        })
+            list +=
+                "<li>" +
+                value.get("quantity") +
+                "ml " +
+                value.get("name") +
+                "</li>\n";
+        });
 
         list += "</ul>\n";
         return list;
@@ -264,7 +285,7 @@ class Cocktail {
 
 function get_value(key, a = KEYS) {
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
+
     const index = a.findIndex((e) => {
         return e === key;
     });
@@ -331,17 +352,17 @@ function compare_scores(a, b) {
     const a_offset = a_props.get("offset");
     const b_offset = b_props.get("offset");
 
-    if(a_rank < b_rank) {
+    if (a_rank < b_rank) {
         return 1;
     }
-    if(b_rank < a_rank) {
+    if (b_rank < a_rank) {
         return -1;
     }
-    
-    if(a_offset < b_offset) {
+
+    if (a_offset < b_offset) {
         return 1;
     }
-    if(b_offset < a_offset) {
+    if (b_offset < a_offset) {
         return -1;
     }
 
@@ -378,7 +399,11 @@ function get_symbols(width = wheels) {
     return mat;
 }
 
-function create_slots(width = wheels, height = wheel_height, negative_fields = 1) {
+function create_slots(
+    width = wheels,
+    height = wheel_height,
+    negative_fields = 1
+) {
     const slot_div = get_slot_div();
     const mat = get_symbols(width);
 
@@ -404,10 +429,81 @@ function create_slots(width = wheels, height = wheel_height, negative_fields = 1
     return mat;
 }
 
-function shift_wheel(mat, wheel_index, height = wheel_height, index = 0) {
+function create_offset_rules(width = wheels, initial_offset = -60) {
+    const base_id = "offset_rule_";
+    for (let i = 0; i < width; ++i) {
+        const offset_rule = document.createElement("style");
+        offset_rule.id = base_id + i;
+        offset_rule.innerText =
+            "#slots .slot:nth-child(" +
+            (i + 1) +
+            ") .field {top: " +
+            initial_offset +
+            "px;}";
+        document.head.appendChild(offset_rule);
+    }
+
+    return base_id;
+}
+
+function set_offset_rule(index, offset, base_id = "offset_rule_") {
+    const offset_rule = document.getElementById(base_id + index);
+    offset_rule.innerText =
+        "#slots .slot:nth-child(" +
+        (index + 1) +
+        ") .field {top: " +
+        offset +
+        "px;}";
+}
+
+function animate_wheel(
+    mat,
+    wheel_index,
+    height = wheel_height,
+    negative_fields = 1,
+    fps = fps,
+    field_height = 120,
+) {
+    const run = wheel_index >= run_anim;
+    const animation_frame = animation_frames[wheel_index];
+    const index = indices[wheel_index];
+
+    if (run) {
+        const field_offset = 60 - (field_height / fps) * mod(animation_frame, fps);
+
+        if (!mod(animation_frame, fps)) {
+            const sym_len = mat[wheel_index].length;
+            for (let i = -negative_fields; i < height; i++) {
+                const sym_index =
+                    (sym_len - (index % sym_len) + i + 1) % sym_len;
+                const field_index = i;
+                const field = document.getElementById(
+                    get_field_id(wheel_index, field_index)
+                );
+                const key = mat[wheel_index][sym_index];
+                field.innerText = get_display_version(SYMBOLS, key);
+                const val = get_value(key);
+                field.setAttribute("value", val);
+            }
+
+            indices[wheel_index] += 1;
+        }
+
+        set_offset_rule(wheel_index, -field_offset);
+        animation_frames[wheel_index] += 1;
+    }
+}
+
+function shift_wheel(
+    mat,
+    wheel_index,
+    height = wheel_height,
+    index = 0,
+    negative_fields = 1
+) {
     const sym_len = mat[wheel_index].length;
 
-    for (let i = 0; i < height; i++) {
+    for (let i = -negative_fields; i < height; i++) {
         const sym_index = (sym_len - (index % sym_len) + i + 1) % sym_len;
         const field_index = i;
         const field = document.getElementById(
@@ -504,22 +600,24 @@ function display_cocktails(cocktails) {
     const scoreboard = document.getElementById("cocktail");
     scoreboard.innerHTML = "";
 
-    const nodes = cocktails.map((c) => (c.to_html()));
-    console.log(nodes)
+    const nodes = cocktails.map((c) => c.to_html());
+    console.log(nodes);
     const string = nodes.join("\n<p>☞ or ☜</p>\n");
     scoreboard.innerHTML = string;
     console.log("Cocktails: " + string);
-
 }
 
 function score_horizontal(rmat) {
     const reps = rmat.map((a, i) => {
         const offset = Math.abs(Math.round(wheels / 2) - i);
-        return [longestRepetition(a.join("")), new Map([
-            ["direction", "horizontal"],
-            ["position", i],
-            ["offset", offset]
-        ])];
+        return [
+            longestRepetition(a.join("")),
+            new Map([
+                ["direction", "horizontal"],
+                ["position", i],
+                ["offset", offset],
+            ]),
+        ];
     });
 
     return reps;
@@ -531,20 +629,26 @@ function score_diagonal(rmat) {
 
     const res_r = rr.map((a, i) => {
         const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
-        return [longestRepetition(a.join("")), new Map([
-            ["direction", "diagonal"],
-            ["position", i],
-            ["offset", offset],
-        ])];
+        return [
+            longestRepetition(a.join("")),
+            new Map([
+                ["direction", "diagonal"],
+                ["position", i],
+                ["offset", offset],
+            ]),
+        ];
     });
 
     const res_l = rl.map((a, i) => {
         const offset = Math.abs(Math.round(rl.length / 2) - i) + rmat.length;
-        return [longestRepetition(a.join("")), new Map([
-            ["direction", "diagonal"],
-            ["position", i],
-            ["offset", offset],
-        ])];
+        return [
+            longestRepetition(a.join("")),
+            new Map([
+                ["direction", "diagonal"],
+                ["position", i],
+                ["offset", offset],
+            ]),
+        ];
     });
 
     const all = res_r.concat(res_l);
@@ -559,29 +663,29 @@ function get_cocktails(recipe_length, direction, position, min_length = 3) {
     const height = rmat.length;
     const middle = Math.round(height / 2.0 + 0.1);
 
-    if(recipe_length < min_length) {
+    if (recipe_length < min_length) {
         return cocktails;
     }
 
-    if(direction === "diagonal") {
+    if (direction === "diagonal") {
         lines.push(middle - 1);
-    } else if(direction === "horizontal") {
-        if(position + 1 === middle) {
-            for(let i = 0; i < height; ++i) {
-                if(i + 1 !== middle) {
+    } else if (direction === "horizontal") {
+        if (position + 1 === middle) {
+            for (let i = 0; i < height; ++i) {
+                if (i + 1 !== middle) {
                     lines.push(i);
                 }
             }
         } else {
-            if(position + 1 < middle) {
-                for(let i = 0; i < middle; ++i) {
-                    if(i !== position) {
+            if (position + 1 < middle) {
+                for (let i = 0; i < middle; ++i) {
+                    if (i !== position) {
                         lines.push(i);
                     }
                 }
-            } else if(position + 1 > middle) {
-                for(let i = middle - 1; i < height; ++i) {
-                    if(i !== position) {
+            } else if (position + 1 > middle) {
+                for (let i = middle - 1; i < height; ++i) {
+                    if (i !== position) {
                         lines.push(i);
                     }
                 }
@@ -593,7 +697,7 @@ function get_cocktails(recipe_length, direction, position, min_length = 3) {
     console.log(lines);
 
     for (const line_index of lines) {
-        const recipe = rmat[line_index].join("").slice(0, recipe_length)
+        const recipe = rmat[line_index].join("").slice(0, recipe_length);
         console.log("recipe " + recipe);
         cocktails.push(new Cocktail(recipe)); // TODO
     }
@@ -615,22 +719,20 @@ function replacer(key, value) {
 
 async function _main() {
     const mat = create_slots(wheels);
-    let indices = new Array(wheels).fill(0);
+    const offset_rules_id = create_offset_rules();
 
     let first_run = wheels;
     await sleeb(1000);
-    
-    while (true) {
-        for (let i = run_anim; i < wheels; i++) {
-            shift_wheel(mat, i, 5, indices[i]);
-            indices[i] += 1;
-            if (first_run) {
-                --first_run;
-                await sleeb(round_delay + round_delay * Math.random() * 5 * Math.random());
-            }
-            await sleeb(round_delay);
-        }
-        await sleeb((round_delay * 8) - round_delay * (wheels - run_anim));
+
+    for (let i = 0; i < wheels; i++) {
+        await sleeb(
+            round_delay + round_delay * Math.random() * 5 * Math.random()
+        );
+        setInterval(
+            animate_wheel,
+            1000 / fps,
+            ...[mat, i, wheel_height, 1, fps, 60]
+        );
     }
 }
 
@@ -642,7 +744,11 @@ async function _main() {
         if (run_anim === wheels) {
             const scores = get_scores(read_wheel());
             const best_score = final_score(scores);
-            const cocktails = get_cocktails(best_score[0].length, best_score[1].get("direction"), best_score[1].get("position"));
+            const cocktails = get_cocktails(
+                best_score[0].length,
+                best_score[1].get("direction"),
+                best_score[1].get("position")
+            );
             console.log(cocktails);
             display_cocktails(cocktails);
         }

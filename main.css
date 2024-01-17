@@ -159,7 +159,7 @@ h1 strong {
     */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Emoji", "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Symbol";
     position: relative;
-    top: -3rem;
+    /* top: -3rem; */
 }
 
 .flex {
