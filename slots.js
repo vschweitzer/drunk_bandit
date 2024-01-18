@@ -529,13 +529,13 @@ function shift_wheel(
     }
 }
 
-function read_wheel(width = wheels, height = wheel_height) {
+function read_wheel(width = wheels, height = wheel_height, negative_fields = 1) {
     const rmat = new Array(height);
     for (let i = 0; i < height; i++) {
         rmat[i] = new Array(width);
         for (let j = 0; j < width; j++) {
             rmat[i][j] = document
-                .getElementById(get_field_id(j, i))
+                .getElementById(get_field_id(j, i - negative_fields))
                 .getAttribute("value");
         }
     }
