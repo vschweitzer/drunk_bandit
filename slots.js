@@ -1,16 +1,17 @@
 const wheels = 5;
 const wheel_height = 5;
 let run_anim = 0;
-const animation_speed = 3.0;
+const animation_speed = 16.0;
 
 // This needs a speed variable additional to the fps, 
 // but i'm too tired right now.
 
-const fps = 256;
+const fps = 16 * animation_speed;
 const round_delay = 20;
 
 let animation_frames = new Array(wheels).fill(1);
 let indices = new Array(wheels).fill(0);
+let run_for = new Array(wheels).fill(Infinity);
 
 async function sleeb(mil) {
     return new Promise((resolve) => {
@@ -463,16 +464,15 @@ function animate_wheel(
     height = wheel_height,
     negative_fields = 1,
     fps = fps,
+    speed = animation_speed,
     field_height = 120,
 ) {
-    const run = wheel_index >= run_anim;
+    const run = run_for[wheel_index] > 0;
     const animation_frame = animation_frames[wheel_index];
     const index = indices[wheel_index];
 
     if (run) {
-        const field_offset =(field_height / fps * animation_frames[wheel_index]) - (field_height / 2);
-
-        if (!mod(animation_frame, fps)) {
+        if (!mod(animation_frame, (fps / speed))) {
             const sym_len = mat[wheel_index].length;
             for (let i = -negative_fields; i < height; i++) {
                 const sym_index =
@@ -490,9 +490,21 @@ function animate_wheel(
             indices[wheel_index] += 1;
         }
 
+        const field_offset =(field_height / (fps / speed) * animation_frames[wheel_index]) - (field_height / 2);
         set_offset_rule(wheel_index,  field_offset);
-        animation_frames[wheel_index] = mod(animation_frames[wheel_index] + animation_speed, fps);
+        animation_frames[wheel_index] = mod(animation_frames[wheel_index] + 1, (fps / speed));
+        if(isFinite(run_for[wheel_index])) {
+            run_for[wheel_index] -= 1;
+        }
     }
+}
+
+function start_wheel(wheel_index) {
+    run_for[wheel_index] = Infinity;
+}
+
+function stop_wheel(wheel_index) {
+    run_for[wheel_index] = (fps / animation_speed) - animation_frames[wheel_index];
 }
 
 function shift_wheel(
@@ -739,9 +751,16 @@ async function _main() {
 
 (async () => {
     sleeb(5);
+    
     //console.log(JSON.stringify(JSON.stringify(SYMBOLS, replacer)));
     document.addEventListener("keyup", (e) => {
+        if(run_anim < wheels) {
+            stop_wheel(run_anim);
+        }
         run_anim = (run_anim + 1) % (wheels + 1);
+        if(run_anim === 0) {
+            run_for.fill(Infinity);
+        }
         if (run_anim === wheels) {
             const scores = get_scores(read_wheel());
             const best_score = final_score(scores);
