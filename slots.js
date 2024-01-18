@@ -1,16 +1,16 @@
 const wheels = 5;
 const wheel_height = 5;
 let run_anim = 0;
-const animation_speed = 16.0;
+const animation_speed = 7.0;
 
 // This needs a speed variable additional to the fps, 
 // but i'm too tired right now.
 
-const fps = 16 * animation_speed;
+const fps = 12 * animation_speed;
 const round_delay = 20;
 
 let animation_frames = new Array(wheels).fill(1);
-let indices = new Array(wheels).fill(0);
+let indices = new Array(wheels).fill(-1);
 let run_for = new Array(wheels).fill(Infinity);
 
 async function sleeb(mil) {
@@ -750,16 +750,19 @@ async function _main() {
 }
 
 (async () => {
-    sleeb(5);
+    await sleeb(5);
     
     //console.log(JSON.stringify(JSON.stringify(SYMBOLS, replacer)));
-    document.addEventListener("keyup", (e) => {
+    document.addEventListener("keyup", async (e) => {
         if(run_anim < wheels) {
             stop_wheel(run_anim);
         }
         run_anim = (run_anim + 1) % (wheels + 1);
         if(run_anim === 0) {
-            run_for.fill(Infinity);
+            for(let i = 0; i < wheels; ++i) {
+                start_wheel(i);
+                await sleeb(round_delay * 12 * Math.random() * Math.random());
+            }
         }
         if (run_anim === wheels) {
             const scores = get_scores(read_wheel());
