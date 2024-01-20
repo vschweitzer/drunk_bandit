@@ -1,14 +1,14 @@
 const wheels = 5;
 const wheel_height = 5;
 let run_anim = 0;
-const animation_speed = 7.0;
+const animation_speed = 5.0; // Find a balance between FF and Chrome
 // The higher the sog, the less reliably the wheels stop in time
-const soggyness = 10.0; 
+const soggyness = 3.0; // No higher than 5 to be fair-ish
 
-// This needs a speed variable additional to the fps, 
+// This needs a speed variable additional to the fps,
 // but i'm too tired right now.
 
-const fps = 12 * animation_speed;
+const fps = Math.round(64 / animation_speed) * animation_speed;
 const round_delay = 20;
 
 let animation_frames = new Array(wheels).fill(1);
@@ -381,6 +381,10 @@ function get_field_id(wheel, field) {
     return "slot_" + wheel + "_field_" + field;
 }
 
+function get_arrow_id(index, direction) {
+    return "arrow_" + direction + "_" + index;
+}
+
 function get_slot_div() {
     return document.getElementById("slots");
 }
@@ -403,6 +407,22 @@ function get_symbols(width = wheels) {
     return mat;
 }
 
+function create_arrow_node(right = true, index) {
+    const node = document.createElement("div");
+    const direction = right ? "right" : "left";
+    node.classList.add("score_arrow_" + direction);
+    node.id = get_arrow_id(index, direction);
+    return node;
+}
+
+function get_arrow_column(right = true) {
+    const direction = right ? "right" : "left";
+    const id = "arrows_" + direction;
+    const node = document.getElementById(id);
+
+    return node;
+}
+
 function create_slots(
     width = wheels,
     height = wheel_height,
@@ -411,6 +431,14 @@ function create_slots(
     const slot_div = get_slot_div();
     const mat = get_symbols(width);
 
+    const arrows_left = get_arrow_column(false);
+    const arrows_right = get_arrow_column(true);
+
+    for (let a = 0; a < height; ++a) {
+        arrows_left.appendChild(create_arrow_node(false, a));
+        arrows_right.appendChild(create_arrow_node(true, a));
+    }
+
     for (let i = 0; i < width; i++) {
         const slot = document.createElement("div");
         slot.classList.add("slot");
@@ -418,6 +446,7 @@ function create_slots(
         slot_div.appendChild(slot);
         for (let j = -negative_fields; j < height; j++) {
             const field = document.createElement("div");
+
             field.classList.add("field");
             field.id = get_field_id(i, j);
             const index = mod(j, mat[i].length);
@@ -467,14 +496,14 @@ function animate_wheel(
     negative_fields = 1,
     fps = fps,
     speed = animation_speed,
-    field_height = 120,
+    field_height = 120
 ) {
     const run = run_for[wheel_index] > 0;
     const animation_frame = animation_frames[wheel_index];
     const index = indices[wheel_index];
 
     if (run) {
-        if (!mod(animation_frame, (fps / speed))) {
+        if (!mod(animation_frame, fps / speed)) {
             const sym_len = mat[wheel_index].length;
             for (let i = -negative_fields; i < height; i++) {
                 const sym_index =
@@ -492,10 +521,15 @@ function animate_wheel(
             indices[wheel_index] += 1;
         }
 
-        const field_offset =(field_height / (fps / speed) * animation_frames[wheel_index]) - (field_height / 2);
-        set_offset_rule(wheel_index,  field_offset);
-        animation_frames[wheel_index] = mod(animation_frames[wheel_index] + 1, (fps / speed));
-        if(isFinite(run_for[wheel_index])) {
+        const field_offset =
+            (field_height / (fps / speed)) * animation_frames[wheel_index] -
+            field_height / 2;
+        set_offset_rule(wheel_index, field_offset);
+        animation_frames[wheel_index] = mod(
+            animation_frames[wheel_index] + 1,
+            fps / speed
+        );
+        if (isFinite(run_for[wheel_index])) {
             run_for[wheel_index] -= 1;
         }
     }
@@ -506,7 +540,8 @@ function start_wheel(wheel_index) {
 }
 
 function stop_wheel(wheel_index) {
-    run_for[wheel_index] = (fps / animation_speed) - animation_frames[wheel_index];
+    run_for[wheel_index] =
+        fps / animation_speed - animation_frames[wheel_index];
 }
 
 function shift_wheel(
@@ -531,7 +566,11 @@ function shift_wheel(
     }
 }
 
-function read_wheel(width = wheels, height = wheel_height, negative_fields = 1) {
+function read_wheel(
+    width = wheels,
+    height = wheel_height,
+    negative_fields = 1
+) {
     const rmat = new Array(height);
     for (let i = 0; i < height; i++) {
         rmat[i] = new Array(width);
@@ -753,16 +792,18 @@ async function _main() {
 
 (async () => {
     await sleeb(5);
-    
+
     //console.log(JSON.stringify(JSON.stringify(SYMBOLS, replacer)));
     document.addEventListener("keyup", async (e) => {
-        if(run_anim < wheels) {
-            await sleeb(round_delay * Math.random() * Math.random() * soggyness);
+        if (run_anim < wheels) {
+            await sleeb(
+                round_delay * Math.random() * Math.random() * soggyness
+            );
             stop_wheel(run_anim);
         }
         run_anim = (run_anim + 1) % (wheels + 1);
-        if(run_anim === 0) {
-            for(let i = 0; i < wheels; ++i) {
+        if (run_anim === 0) {
+            for (let i = 0; i < wheels; ++i) {
                 start_wheel(i);
                 await sleeb(round_delay * 12 * Math.random() * Math.random());
             }

@@ -25,9 +25,34 @@ header {
     max-height: 80vh;
 }
 
+#arrows_right, #arrows_left {
+    width: 50px;
+    height: 30rem;
+}
+
+.score_arrow_left {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+
+    margin-right: -5px;
+}
+
+.score_arrow_right, .score_arrow_left {
+    background-image: url("arrow_right.svg");
+    height: 6rem;
+    width: calc(6rem * (0.5));
+    background-size: contain;
+    margin: 0rem;
+}
+
+
 main {
     height: 30rem;
-    min-width: 30rem;
+    min-width: 36rem;
     overflow: hidden;
 }
 
@@ -109,10 +134,13 @@ h1 strong {
 }
 
 #wheel_frame {
-    background-color: #000;
+    /*background-color: #000;*/
     padding: 0.3rem 0.1rem;
     margin: 0;
     z-index: 1;
+
+    
+   
 }
 
 #wheel_overlay {
@@ -125,6 +153,8 @@ h1 strong {
     overflow: hidden;
     padding: -6rem 0 0 0;
     z-index: 5;
+
+
 }
 
 
