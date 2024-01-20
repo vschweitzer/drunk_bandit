@@ -244,9 +244,9 @@ class Cocktail {
             const i_index = index_from_value(recipe[index]);
             const key = KEYS[i_index];
             const ingredient = SYMBOLS.get(key);
-            console.log(i_index);
-            console.log(key);
-            console.log(ingredient);
+            //console.log(i_index);
+            //console.log(key);
+            //console.log(ingredient);
 
             if (this.ingredients.has(key)) {
                 this.ingredients
@@ -269,7 +269,7 @@ class Cocktail {
     }
 
     to_html() {
-        console.log(this.ingredients);
+        //console.log(this.ingredients);
 
         let list = "<ul>\n";
 
@@ -351,7 +351,7 @@ function compare_scores(a, b) {
     const a_rank = dir_rank.indexOf(a_props.get("direction"));
     const b_rank = dir_rank.indexOf(b_props.get("direction"));
 
-    console.log("ranks" + a_rank + " " + b_rank);
+    //console.log("ranks" + a_rank + " " + b_rank);
 
     const a_offset = a_props.get("offset");
     const b_offset = b_props.get("offset");
@@ -586,9 +586,13 @@ function read_wheel(
 
 // https://stackoverflow.com/questions/58573919/longest-repeating-character-in-string-javascript
 function longestRepetition(str) {
+    let longest_index = 0;
+    let current_index = 0;
     if (str.length === 0) {
-        return "";
+        return ["", longest_index];
     }
+
+    
     let longest = "";
     let chunk = "";
     for (let i = 0; i < str.length; i++) {
@@ -603,15 +607,17 @@ function longestRepetition(str) {
                 //console.log("chunk**", chunk);
             }
             if (str[i] !== str[i - 1]) {
+                current_index = i;
                 chunk = str[i];
             }
             if (chunk.length > longest.length) {
+                longest_index = current_index;
                 longest = chunk;
             }
         }
     }
     //console.log(longest);
-    return longest;
+    return [longest, longest_index];
 }
 
 function get_scores(rmat) {
@@ -631,8 +637,8 @@ function final_score(scores, min_length = 3) {
     if (best_score[0].length < min_length) {
         str_repr = "No Win";
     } else {
-        console.log(scores);
-        console.log(best_score);
+        //console.log(scores);
+        //console.log(best_score);
         for (const value of best_score[0]) {
             const index = index_from_value(value);
             const key = KEYS[index];
@@ -655,21 +661,25 @@ function display_cocktails(cocktails) {
     scoreboard.innerHTML = "";
 
     const nodes = cocktails.map((c) => c.to_html());
-    console.log(nodes);
+    //console.log(nodes);
     const string = nodes.join("\n<p>☞ or ☜</p>\n");
     scoreboard.innerHTML = string;
-    console.log("Cocktails: " + string);
+    //console.log("Cocktails: " + string);
 }
 
 function score_horizontal(rmat) {
     const reps = rmat.map((a, i) => {
         const offset = Math.abs(Math.round(wheels / 2) - i);
+        let indent;
+        let str;
+        [str, indent] = longestRepetition(a.join(""));
         return [
-            longestRepetition(a.join("")),
+            str,
             new Map([
                 ["direction", "horizontal"],
                 ["position", i],
                 ["offset", offset],
+                ["indent", indent],
             ]),
         ];
     });
@@ -681,26 +691,37 @@ function score_diagonal(rmat) {
     const rr = rot45(rmat);
     const rl = rot45(rmat, true);
 
+    console.log(rr);
+    console.log(rl);
+
     const res_r = rr.map((a, i) => {
         const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
+        let indent;
+        let str;
+        [str, indent] = longestRepetition(a.join(""));
         return [
-            longestRepetition(a.join("")),
+            str,
             new Map([
                 ["direction", "diagonal"],
                 ["position", i],
                 ["offset", offset],
+                ["indent", indent],
             ]),
         ];
     });
 
     const res_l = rl.map((a, i) => {
         const offset = Math.abs(Math.round(rl.length / 2) - i) + rmat.length;
+        let indent;
+        let str;
+        [str, indent] = longestRepetition(a.join(""));
         return [
-            longestRepetition(a.join("")),
+            str,
             new Map([
                 ["direction", "diagonal"],
                 ["position", i],
                 ["offset", offset],
+                ["indent", indent],
             ]),
         ];
     });
@@ -747,12 +768,12 @@ function get_cocktails(recipe_length, direction, position, min_length = 3) {
         }
     }
 
-    console.log("lines: ");
-    console.log(lines);
+    //console.log("lines: ");
+    //console.log(lines);
 
     for (const line_index of lines) {
         const recipe = rmat[line_index].join("").slice(0, recipe_length);
-        console.log("recipe " + recipe);
+        //console.log("recipe " + recipe);
         cocktails.push(new Cocktail(recipe)); // TODO
     }
 
@@ -816,7 +837,7 @@ async function _main() {
                 best_score[1].get("direction"),
                 best_score[1].get("position")
             );
-            console.log(cocktails);
+            //console.log(cocktails);
             display_cocktails(cocktails);
         }
     });
