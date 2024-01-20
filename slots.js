@@ -587,7 +587,7 @@ function read_wheel(
 // https://stackoverflow.com/questions/58573919/longest-repeating-character-in-string-javascript
 function longestRepetition(str) {
     if (str.length === 0) {
-        return ["", 0];
+        return "";
     }
     let longest = "";
     let chunk = "";
