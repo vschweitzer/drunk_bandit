@@ -176,6 +176,7 @@ h1 strong {
 .field {
     z-index: -1;
     height: 6rem;
+    line-height: 6rem;
     justify-content: center;
     align-items: center;
     text-align: center;
