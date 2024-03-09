@@ -669,7 +669,7 @@ function display_cocktails(cocktails) {
 
 function score_horizontal(rmat) {
     const reps = rmat.map((a, i) => {
-        const offset = Math.abs(Math.round(wheels / 2) - i);
+        const offset = Math.abs(Math.round(wheel_height / 2) - i - 1);
         let indent;
         let str;
         [str, indent] = longestRepetition(a.join(""));
@@ -695,7 +695,7 @@ function score_diagonal(rmat) {
     console.log(rl);
 
     const res_r = rr.map((a, i) => {
-        const offset = Math.abs(Math.round(rr.length / 2) - i) + rmat.length;
+        const offset = Math.abs(Math.round(rr.length / 2) - i - 1) + rmat.length;
         let indent;
         let str;
         [str, indent] = longestRepetition(a.join(""));
@@ -711,7 +711,7 @@ function score_diagonal(rmat) {
     });
 
     const res_l = rl.map((a, i) => {
-        const offset = Math.abs(Math.round(rl.length / 2) - i) + rmat.length;
+        const offset = Math.abs(Math.round(rl.length / 2) - i - 1) + rmat.length;
         let indent;
         let str;
         [str, indent] = longestRepetition(a.join(""));
